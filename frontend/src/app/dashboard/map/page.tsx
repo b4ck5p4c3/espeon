@@ -69,7 +69,7 @@ function MapComponent() {
     useEffect(() => {
         queryClient.refetchQueries({queryKey: [AIRTAGS_QUERY_KEY]}).catch(() => {
         });
-    }, [reports.data]);
+    }, [reports.data, queryClient]);
 
     const yMaps = useYMaps(['templateLayoutFactory']);
 
@@ -87,7 +87,7 @@ function MapComponent() {
         }
         {
             reports.data?.map((airTag, index) =>
-                <Clusterer options={{
+                <Clusterer key={airTag.airTag.id} options={{
                     gridSize: 90,
                     zIndexHover: index,
                     clusterIconColor: airTag.airTag.privateData.color

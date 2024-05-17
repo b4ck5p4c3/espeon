@@ -25,6 +25,6 @@ export default function Index() {
         if (auth.data) {
             router.push("/dashboard/map");
         }
-    }, [auth.data]);
+    }, [auth.data, router]);
     return <></>;
 }

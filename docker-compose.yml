@@ -1,6 +1,9 @@
 services:
   backend:
-    build: backend
+    build:
+      context: backend
+      args:
+        - NEXT_PUBLIC_BASE_URL=/api
     restart: always
     environment:
       DATABASE_URL: postgres://espeon:espeon@postgres:5432/espeon
