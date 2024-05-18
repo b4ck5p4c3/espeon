@@ -73,7 +73,7 @@ function MapComponent() {
 
     return <>{yMaps ? <Map defaultState={{center: [59.93, 30.31], zoom: 12}} width={"100%"} height={"100%"}>
         {
-            reports.data?.map((airTag, index) =>
+            reports.isFetching ? <></> : reports.data?.map((airTag, index) =>
                 <Polyline key={airTag.airTag.id}
                           geometry={airTag.reports.map(item => ([item.data.lat, item.data.lon]))}
                           options={{
@@ -84,7 +84,7 @@ function MapComponent() {
             )
         }
         {
-            reports.data?.map((airTag, index) =>
+            reports.isFetching ? <></> : reports.data?.map((airTag, index) =>
                 <Clusterer key={airTag.airTag.id} options={{
                     gridSize: 90,
                     zIndexHover: index,
@@ -105,7 +105,7 @@ function MapComponent() {
             )
         }
         {
-            reports.data?.filter(airTag => airTag.reports.length > 0)?.map((airTag, index) =>
+            reports.isFetching ? <></> : reports.data?.filter(airTag => airTag.reports.length > 0)?.map((airTag, index) =>
                 <Placemark key={airTag.airTag.id}
                            geometry={[airTag.reports[0].data.lat, airTag.reports[0].data.lon]}
                            options={{
