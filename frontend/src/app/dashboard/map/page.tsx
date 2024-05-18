@@ -56,8 +56,6 @@ function MapComponent() {
                 });
             }
 
-            console.info(decryptedReports);
-
             return decryptedReports;
         },
         queryKey: [REPORTS_QUERY_KEY],

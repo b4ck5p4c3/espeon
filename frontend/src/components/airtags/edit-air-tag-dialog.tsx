@@ -35,7 +35,7 @@ export function EditAirTagDialog({airTag, onSubmit, onOpenChange, loading}: {
         }
     });
 
-    return <Dialog open={true} onOpenChange={onOpenChange}>
+    return <Dialog open={true} onOpenChange={onOpenChange} modal={false}>
         <DialogContent>
             <DialogHeader>
                 <DialogTitle>Edit AirTag</DialogTitle>

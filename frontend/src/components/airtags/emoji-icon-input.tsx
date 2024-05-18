@@ -17,7 +17,8 @@ export function EmojiIconInput({value, disabled, onChange}: EmojiIconInputProps)
         <EmojiPicker set={"apple"} onEmojiSelect={(emoji: { unified: string }) => {
             setEmojiPickerShown(false);
             onChange(emoji.unified);
-        }}/> :
+        }}/>
+        :
         <>
             <div className={"flex flex-row gap-2 items-center w-full"}>
                 <div>

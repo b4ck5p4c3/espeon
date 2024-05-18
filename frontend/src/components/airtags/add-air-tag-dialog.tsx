@@ -2,7 +2,7 @@ import {z} from "zod";
 import {getAdvertisementKey} from "@/lib/apple-cryptography";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog";
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogOverlay, DialogTitle} from "@/components/ui/dialog";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
@@ -42,7 +42,7 @@ export function AddAirTagDialog({onSubmit, loading, onOpenChange}: {
         }
     });
 
-    return <Dialog open={true} onOpenChange={onOpenChange}>
+    return <Dialog open={true} onOpenChange={onOpenChange} modal={false}>
         <DialogContent>
             <DialogHeader>
                 <DialogTitle>Add AirTag</DialogTitle>
