@@ -10,4 +10,4 @@ RUN yarn build
 
 FROM nginx:latest
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
-COPY ./out/ /app/ --from=builder
+COPY --from=builder /app/out/ /app/
