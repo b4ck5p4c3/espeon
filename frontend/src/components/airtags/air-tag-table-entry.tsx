@@ -97,7 +97,7 @@ export function AirTagTableEntry({airTag}: { airTag: AirTagData }) {
                 {airTag.privateData.name}
             </TableCell>
             <TableCell>
-                <AppleEmoji unified={airTag.privateData.icon} className={"w-10 h-10"}/>
+                <AppleEmoji unified={airTag.privateData.icon} className={"min-w-10 max-w-10 min-h-10 max-h-10"}/>
             </TableCell>
             <TableCell>
                 <div style={{backgroundColor: airTag.privateData.color}} className={"w-6 h-6 rounded-full"}/>
