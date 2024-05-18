@@ -2,8 +2,6 @@ services:
   backend:
     build:
       context: backend
-      args:
-        - NEXT_PUBLIC_BASE_URL=/api
     restart: always
     environment:
       DATABASE_URL: postgres://espeon:espeon@postgres:5432/espeon
@@ -11,10 +9,11 @@ services:
       APPLE_FINDMY_URL: https://mh.dev.0x08.in
       REGISTER_TOKEN: DoNotRegisterHere
   frontend:
-    build: frontend
+    build: 
+      context: frontend
+      args:
+        NEXT_PUBLIC_BASE_URL: /api
     restart: always
-    environment:
-      NEXT_PUBLIC_BASE_URL: /api
   nginx:
     build: nginx
     restart: always
