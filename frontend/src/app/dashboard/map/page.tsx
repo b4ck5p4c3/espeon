@@ -59,7 +59,8 @@ function MapComponent() {
             return decryptedReports;
         },
         queryKey: [REPORTS_QUERY_KEY],
-        retry: false
+        retry: false,
+        refetchOnWindowFocus: false
     });
 
     const queryClient = useQueryClient();
