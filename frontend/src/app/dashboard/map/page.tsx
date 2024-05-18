@@ -107,7 +107,7 @@ function MapComponent() {
             )
         }
         {
-            reports.data?.map((airTag, index) =>
+            reports.data?.filter(airTag => airTag.reports.length > 0)?.map((airTag, index) =>
                 <Placemark key={airTag.airTag.id}
                            geometry={[airTag.reports[0].data.lat, airTag.reports[0].data.lon]}
                            options={{
