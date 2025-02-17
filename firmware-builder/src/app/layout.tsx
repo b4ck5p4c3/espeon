@@ -4,8 +4,8 @@ import {Toaster} from "@/components/ui/toaster";
 import {AppQueryClientProvider} from "@/components/app-query-client-provider";
 
 export const metadata: Metadata = {
-    title: "Espeon-Builder",
-    description: "Espeon AirWCH firmware builder",
+    title: "AirWCH builder",
+    description: "AirWCH firmware builder",
 };
 
 export default function RootLayout({children,}: Readonly<{ children: React.ReactNode; }>) {

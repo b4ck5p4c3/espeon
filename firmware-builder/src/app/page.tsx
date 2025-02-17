@@ -130,7 +130,7 @@ export default function Home() {
     }, [toast]);
 
     return (<main className={"w-6/12 m-auto flex flex-col mt-5 gap-5"}>
-        <h1 className={"text-2xl"}>Espeon Firmware Builder</h1>
+        <h1 className={"text-2xl"}>AirWCH firmware builder</h1>
         <Separator/>
         <div className={"flex flex-col gap-5"}>
             <Button disabled={isBuilding} onClick={() => generateKeyPair()
