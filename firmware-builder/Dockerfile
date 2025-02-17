@@ -4,6 +4,8 @@ COPY ./package.json ./package.json
 COPY ./yarn.lock ./yarn.lock
 RUN yarn --frozen-lockfile
 COPY . .
+ARG NEXT_BASE_PATH
+ENV NEXT_BASE_PATH=${NEXT_BASE_PATH}
 RUN yarn build
 
 FROM nginx:latest
