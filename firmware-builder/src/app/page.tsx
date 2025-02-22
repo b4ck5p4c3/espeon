@@ -72,8 +72,7 @@ async function downloadAndBuild(
         throw new Error(`Failed to patch MAC blob: ${e}`);
     }
 
-    downloadArray(firmwareBinary, `firmware-${release}-${
-        keyPair.advertisementHash.replaceAll("=", "")}.bin`, "application/octet-steam");
+    downloadArray(firmwareBinary, `firmware-${release}-${keyPair.mac.replaceAll(':', '')}.bin`, "application/octet-steam");
 }
 
 function hidePrivateKey(text: string): string {
