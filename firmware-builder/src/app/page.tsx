@@ -3,14 +3,13 @@
 import {Separator} from "@/components/ui/separator";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
-import {Copy, Loader2, RefreshCw} from "lucide-react";
+import {Copy, Loader2} from "lucide-react";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {useCallback, useEffect, useState} from "react";
 import {Octokit} from "octokit";
 import {useQuery} from "@tanstack/react-query";
 import {Badge} from "@/components/ui/badge";
 import {useToast} from "@/hooks/use-toast";
-import {generateMACAddress, isMACValid} from "@/lib/mac";
 import {KeyPair, generateKeyPair, isKeyPairValid} from "@/lib/crypto";
 import {BLE_DATA_SIZE_TEMPLATE_BLOB, BLE_DATA_TEMPLATE_BLOB, MAC_TEMPLATE_BLOB} from "@/lib/firmware/templates";
 import {patchFirmware} from "@/lib/firmware/patcher";
@@ -35,8 +34,11 @@ function downloadUrl(url: string, fileName: string): void {
     a.remove();
 }
 
-async function downloadAndBuild(release: string, keyPair: KeyPair,
-                                macAddress: string, setStatus: (status: string) => void): Promise<void> {
+async function downloadAndBuild(
+    release: string, 
+    keyPair: KeyPair,
+    setStatus: (status: string) => void
+): Promise<void> {
     setStatus("Fetching firmware binary...");
     const firmwareResponse = await fetch(`${process.env.NEXT_PUBLIC_FIRMWARE_DOWNLOAD_URL}/firmware-${release}.bin`);
     if (!firmwareResponse.ok) {
@@ -65,7 +67,7 @@ async function downloadAndBuild(release: string, keyPair: KeyPair,
     }
     try {
         patchFirmware(firmwareBinary, MAC_TEMPLATE_BLOB,
-            new Uint8Array(macAddress.split(":").map(octet => parseInt(octet, 16))));
+            new Uint8Array(keyPair.mac.split(":").map(octet => parseInt(octet, 16))));
     } catch (e) {
         throw new Error(`Failed to patch MAC blob: ${e}`);
     }
@@ -87,9 +89,9 @@ export default function Home() {
     const [keyPair, setKeyPair] = useState<KeyPair>({
         advertisement: "",
         advertisementHash: "",
-        private: ""
+        private: "",
+        mac: "",
     });
-    const [macAddress, setMACAddress] = useState<string>("");
     const [selectedRelease, setSelectedRelease] = useState<string>("");
     const [isBuilding, setIsBuilding] = useState<boolean>(false);
     const [buildStatus, setBuildStatus] = useState<string>("");
@@ -108,7 +110,6 @@ export default function Home() {
     });
 
     useEffect(() => {
-        setMACAddress(generateMACAddress());
         generateKeyPair()
             .then(keyPair => setKeyPair(keyPair));
     }, []);
@@ -160,10 +161,7 @@ export default function Home() {
         <Separator/>
         <div className={"flex flex-row items-center"}>
             <div className={"min-w-[180px]"}>MAC address:</div>
-            <Input disabled={isBuilding} type={"text"} className={"rounded-r-none font-mono"} value={macAddress}
-                   onChange={e => setMACAddress(e.target.value.toUpperCase())}/>
-            <Button disabled={isBuilding} className={"rounded-l-none"}
-                    onClick={() => setMACAddress(generateMACAddress())}><RefreshCw/></Button>
+            <Input disabled type={"text"} className={"rounded-r-none font-mono"} value={keyPair.mac} />
         </div>
         <Separator/>
         <div className={"flex flex-row items-center"}>
@@ -184,11 +182,11 @@ export default function Home() {
             </Select>
         </div>
         <Button
-            disabled={!isMACValid(macAddress) || !isKeyPairValid(keyPair) || !selectedRelease || isBuilding}
+            disabled={!isKeyPairValid(keyPair) || !selectedRelease || isBuilding}
             onClick={() => {
                 setIsBuilding(true);
                 setBuildStatus("Building...");
-                downloadAndBuild(selectedRelease, keyPair, macAddress,
+                downloadAndBuild(selectedRelease, keyPair,
                     status => setBuildStatus(status))
                     .catch(error => {
                         toast({
