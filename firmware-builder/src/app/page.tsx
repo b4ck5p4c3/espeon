@@ -10,8 +10,8 @@ import {Octokit} from "octokit";
 import {useQuery} from "@tanstack/react-query";
 import {Badge} from "@/components/ui/badge";
 import {useToast} from "@/hooks/use-toast";
-import {KeyPair, generateKeyPair, isKeyPairValid} from "@/lib/crypto";
-import {BLE_DATA_SIZE_TEMPLATE_BLOB, BLE_DATA_TEMPLATE_BLOB, MAC_TEMPLATE_BLOB} from "@/lib/firmware/templates";
+import {KeyPair, generateKeyPair, isKeyPairValid, getMacAddress, getAdvertisementKeyData} from "@/lib/crypto";
+import {BLE_DATA_TEMPLATE_BLOB} from "@/lib/firmware/templates";
 import {patchFirmware} from "@/lib/firmware/patcher";
 
 const octokit = new Octokit();
@@ -34,8 +34,12 @@ function downloadUrl(url: string, fileName: string): void {
     a.remove();
 }
 
+function macToString(mac: number[]): string {
+    return mac.map(octet => octet.toString(16).padStart(2, "0")).join(":");
+}
+
 async function downloadAndBuild(
-    release: string, 
+    release: string,
     keyPair: KeyPair,
     setStatus: (status: string) => void
 ): Promise<void> {
@@ -47,9 +51,12 @@ async function downloadAndBuild(
     const firmwareBinary = new Uint8Array(await firmwareResponse.arrayBuffer());
     setStatus("Patching firmware binary...");
 
-    const keyData = [...atob(keyPair.advertisement)].map(octet => octet.charCodeAt(0));
+    const keyData = getAdvertisementKeyData(keyPair);
+
+    const mac = getMacAddress(keyPair);
 
     const bleDataBlob = new Uint8Array([
+        ...mac,
         0x1E, 0xFF, 0x4C, 0x00, 0x12, 0x19, 0x00,
         ...keyData.slice(6, 28), keyData[0] >> 6, 0x00
     ]);
@@ -59,37 +66,16 @@ async function downloadAndBuild(
     } catch (e) {
         throw new Error(`Failed to patch BLE data blob: ${e}`);
     }
-    try {
-        patchFirmware(firmwareBinary, BLE_DATA_SIZE_TEMPLATE_BLOB,
-            new Uint8Array(new Uint32Array([bleDataBlob.length]).buffer));
-    } catch (e) {
-        throw new Error(`Failed to patch BLE data size blob: ${e}`);
-    }
-    try {
-        patchFirmware(firmwareBinary, MAC_TEMPLATE_BLOB,
-            new Uint8Array(keyPair.mac.split(":").map(octet => parseInt(octet, 16))));
-    } catch (e) {
-        throw new Error(`Failed to patch MAC blob: ${e}`);
-    }
 
-    downloadArray(firmwareBinary, `firmware-${release}-${keyPair.mac.replaceAll(':', '')}.bin`, "application/octet-steam");
-}
-
-function hidePrivateKey(text: string): string {
-    if (text === "") {
-        return "";
-    }
-    const start = text.slice(0, 5);
-    const end = text.slice(text.length - 7);
-    return start + [...Array(text.length - 12)].map(() => "*").join("") + end;
+    downloadArray(firmwareBinary, `firmware-${release}-${
+        macToString(mac).replaceAll(":", "_")}.bin`, "application/octet-steam");
 }
 
 export default function Home() {
     const [keyPair, setKeyPair] = useState<KeyPair>({
         advertisement: "",
         advertisementHash: "",
-        private: "",
-        mac: "",
+        private: ""
     });
     const [selectedRelease, setSelectedRelease] = useState<string>("");
     const [isBuilding, setIsBuilding] = useState<boolean>(false);
@@ -139,7 +125,7 @@ export default function Home() {
                 <div className={"flex flex-row items-center"}>
                     <div className={"min-w-[180px]"}>Private:</div>
                     <Input type={"text"} className={"rounded-r-none font-mono"} disabled={true} readOnly={true}
-                           value={hidePrivateKey(keyPair.private)}/>
+                           value={keyPair.private}/>
                     <Button className={"rounded-l-none"} onClick={() => copy(keyPair.private)}><Copy/></Button>
                 </div>
                 <div className={"flex flex-row items-center"}>
@@ -160,7 +146,10 @@ export default function Home() {
         <Separator/>
         <div className={"flex flex-row items-center"}>
             <div className={"min-w-[180px]"}>MAC address:</div>
-            <Input disabled type={"text"} className={"rounded-r-none font-mono"} value={keyPair.mac} />
+            <Input disabled={true} readOnly={true} type={"text"} className={"rounded-r-none font-mono"}
+                   value={macToString(getMacAddress(keyPair))}/>
+            <Button className={"rounded-l-none"}
+                    onClick={() => copy(macToString(getMacAddress(keyPair)))}><Copy/></Button>
         </div>
         <Separator/>
         <div className={"flex flex-row items-center"}>

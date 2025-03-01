@@ -4,7 +4,6 @@ export interface KeyPair {
     advertisement: string;
     advertisementHash: string;
     private: string;
-    mac: string;
 }
 
 export function toBase64(buffer: ArrayBuffer): string {
@@ -24,24 +23,24 @@ export async function generateKeyPair(): Promise<KeyPair> {
             continue;
         }
 
-        const mac = [
-            publicKey[5],
-            publicKey[4],
-            publicKey[3],
-            publicKey[2],
-            publicKey[1],
-            publicKey[0] | 0b11000000,
-        ].map(b => b.toString(16).padStart(2, "0")).join(":").toUpperCase();
-
         return {
             advertisement: advertisementKey,
             advertisementHash: advertisementHash,
-            private: privateKey,
-            mac,
+            private: privateKey
         };
     }
 }
 
 export function isKeyPairValid(keyPair: KeyPair): boolean {
     return !!keyPair.private && !!keyPair.advertisement;
+}
+
+export function getMacAddress(keyPair: KeyPair): number[] {
+    const keyData = getAdvertisementKeyData(keyPair);
+
+    return [keyData[0] | 0b11000000, ...keyData.slice(1, 6)];
+}
+
+export function getAdvertisementKeyData(keyPair: KeyPair): number[] {
+    return [...atob(keyPair.advertisement)].map(octet => octet.charCodeAt(0));
 }
