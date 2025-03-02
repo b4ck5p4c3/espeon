@@ -54,10 +54,11 @@ async function downloadAndBuild(
 
     const keyData = getAdvertisementKeyData(keyPair);
 
-    const mac = getMacAddress(keyPair).slice(0).reverse();
+    const mac = getMacAddress(keyPair);
+    const dataBlobMac = mac.slice(0).reverse();
 
     const bleDataBlob = new Uint8Array([
-        ...mac,
+        ...dataBlobMac,
         0x1E, 0xFF, 0x4C, 0x00, 0x12, 0x19, 0x00,
         ...keyData.slice(6, 28), keyData[0] >> 6, 0x00
     ]);
