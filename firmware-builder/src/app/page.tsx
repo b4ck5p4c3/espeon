@@ -44,7 +44,8 @@ async function downloadAndBuild(
     setStatus: (status: string) => void
 ): Promise<void> {
     setStatus("Fetching firmware binary...");
-    const firmwareResponse = await fetch(`${process.env.NEXT_PUBLIC_FIRMWARE_DOWNLOAD_URL}/firmware-${release}.bin`);
+    const firmwareResponse = await fetch(`${process.env.NEXT_PUBLIC_FIRMWARE_DOWNLOAD_URL
+    }/firmware-${release}.bin`);
     if (!firmwareResponse.ok) {
         throw new Error(`Failed to download firmware binary: ${firmwareResponse.status}`)
     }
@@ -60,6 +61,11 @@ async function downloadAndBuild(
         0x1E, 0xFF, 0x4C, 0x00, 0x12, 0x19, 0x00,
         ...keyData.slice(6, 28), keyData[0] >> 6, 0x00
     ]);
+
+    if (bleDataBlob.length !== BLE_DATA_TEMPLATE_BLOB.length) {
+        throw new Error(`Failed to generate data blob, wrong length: ${bleDataBlob.length} != ${
+            BLE_DATA_TEMPLATE_BLOB.length}`);
+    }
 
     try {
         patchFirmware(firmwareBinary, BLE_DATA_TEMPLATE_BLOB, bleDataBlob);
@@ -163,7 +169,8 @@ export default function Home() {
                 <SelectContent>
                     {
                         releases.data ? releases.data.map(release => <SelectItem key={release.tag_name}
-                                                                                 value={release.tag_name}>{release.tag_name} {release.prerelease ?
+                                                                                 value={release.tag_name}>
+                            {release.tag_name} {release.prerelease ?
                             <Badge variant={"secondary"}>Prerelease</Badge> : <></>}</SelectItem>) : <></>
                     }
                 </SelectContent>
