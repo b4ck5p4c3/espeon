@@ -80,7 +80,7 @@ export function AirTagTableEntry({airTag}: { airTag: AirTagData }) {
                 <div style={{backgroundColor: airTag.privateData.color}} className={"w-6 h-6 rounded-full"}/>
             </TableCell>
             <TableCell>
-                {macToString(getMacAddress(airTag.privateData.privateKey))}
+                <pre>{macToString(getMacAddress(airTag.privateData.privateKey))}</pre>
             </TableCell>
             <TableCell>
                 {airTag.privateData.privateKey}
