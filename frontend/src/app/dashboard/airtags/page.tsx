@@ -71,7 +71,13 @@ export default function DashboardAirTags() {
                         Color
                     </TableHead>
                     <TableHead>
-                        Advertisement Key
+                        MAC address
+                    </TableHead>
+                    <TableHead>
+                        Private key
+                    </TableHead>
+                    <TableHead>
+                        Advertisement key hash
                     </TableHead>
                     <TableHead>
                         Last fetch

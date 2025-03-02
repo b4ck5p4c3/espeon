@@ -1,14 +1,24 @@
-import {ec as EC} from "elliptic";
+import {ec, ec as EC} from "elliptic";
 import {fromBase64, toBase64} from "@/lib/base64";
 
 export async function getAdvertisementKey(privateKey: string): Promise<string> {
+    const advertisementKey = getPublicKey(privateKey);
+    const crypto = window.crypto.subtle;
+    const advertisementKeyHash = new Uint8Array(await crypto.digest("SHA-256", advertisementKey));
+    return toBase64(advertisementKeyHash);
+}
+
+export function getPublicKey(privateKey: string): ArrayBuffer {
     const curve = new EC("p224");
     const key = fromBase64(privateKey);
     const ki = curve.keyFromPrivate(key);
-    const crypto = window.crypto.subtle;
-    const publicKey = new Uint8Array(ki.getPublic().encode("array", true).slice(1)).buffer;
-    const advertisementKey = new Uint8Array(await crypto.digest("SHA-256", publicKey));
-    return toBase64(advertisementKey);
+    return new Uint8Array(ki.getPublic().encode("array", true).slice(1)).buffer;
+}
+
+export function getMacAddress(privateKey: string): number[] {
+    const keyData = [...new Uint8Array(getPublicKey(privateKey))];
+
+    return [keyData[0] | 0b11000000, ...keyData.slice(1, 6)];
 }
 
 export interface ReportData {

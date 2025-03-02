@@ -21,6 +21,11 @@ import {
 import {Input} from "@/components/ui/input";
 import {AppleEmoji} from "@/components/apple-emoji";
 import {ConfirmDeleteAirTagDialog} from "@/components/airtags/confirm-delete-air-tag-dialog";
+import {getMacAddress} from "@/lib/apple-cryptography";
+
+function macToString(mac: number[]): string {
+    return mac.map(octet => octet.toString(16).padStart(2, "0")).join(":");
+}
 
 export function AirTagTableEntry({airTag}: { airTag: AirTagData }) {
     const [editAirTagOpened, setEditAirTagOpened] = useState(false);
@@ -73,6 +78,12 @@ export function AirTagTableEntry({airTag}: { airTag: AirTagData }) {
             </TableCell>
             <TableCell>
                 <div style={{backgroundColor: airTag.privateData.color}} className={"w-6 h-6 rounded-full"}/>
+            </TableCell>
+            <TableCell>
+                {macToString(getMacAddress(airTag.privateData.privateKey))}
+            </TableCell>
+            <TableCell>
+                {airTag.privateData.privateKey}
             </TableCell>
             <TableCell>
                 {airTag.advertisementKey}
