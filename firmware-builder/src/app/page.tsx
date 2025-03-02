@@ -54,7 +54,7 @@ async function downloadAndBuild(
 
     const keyData = getAdvertisementKeyData(keyPair);
 
-    const mac = getMacAddress(keyPair);
+    const mac = getMacAddress(keyPair).slice(0).reverse();
 
     const bleDataBlob = new Uint8Array([
         ...mac,
