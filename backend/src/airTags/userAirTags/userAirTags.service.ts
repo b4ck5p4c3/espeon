@@ -1,7 +1,7 @@
 import {Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {AirTag} from "../../common/database/entities/airTag.entity";
-import {Repository} from "typeorm";
+import {In, Repository} from "typeorm";
 import {UserAirTag} from "../../common/database/entities/userAirTag.entity";
 import {User} from "../../common/database/entities/user.entity";
 
@@ -39,6 +39,17 @@ export class UserAirTagsService {
             relations: includeAirTag ? {
                 airTag: true
             } : {}
+        });
+    }
+
+    async findManyByIds(ids: string[]): Promise<UserAirTag[]> {
+        return this.userAirTagsRepository.find({
+            where: {
+                id: In(ids)
+            },
+            relations: {
+                airTag: true,
+            }
         });
     }
 
