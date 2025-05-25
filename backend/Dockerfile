@@ -1,8 +1,9 @@
-FROM node:21
+FROM node:22-slim
+ENV NODE_ENV=production
+RUN corepack enable
 WORKDIR /app
-COPY ./package.json ./package.json 
-COPY ./yarn.lock ./yarn.lock
-RUN yarn --frozen-lockfile
+COPY ./package.json ./pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 COPY . .
-RUN yarn build
-CMD yarn start:prod
+RUN ["pnpm", "run", "build" ]
+CMD ["pnpm", "run", "start:prod"]
