@@ -2,6 +2,7 @@
   "name": "airfrontend-next",
   "version": "0.1.0",
   "private": true,
+  "license": "MPL-2.0",
   "scripts": {
     "dev": "next dev -p 3001",
     "build": "next build",
